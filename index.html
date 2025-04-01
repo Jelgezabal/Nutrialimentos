@@ -5,7 +5,71 @@
     <title>Buscador de Alimentos</title>
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .search-button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        table th:hover {
+            background-color: #e8e8e8;
+        }
+        table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        table tr:hover {
+            background-color: #ddd;
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -17,19 +81,19 @@
                 categoria: "Carnes",
                 nombre: "Carne de Hamburguesa",
                 kcal: 240,
-                proteinas: 19.17,
+                proteinas: 19.2,
                 hidratos: 0.5,
-                grasas: 18.33,
+                grasas: 18.3,
                 fibra: 0,
-                calcio: 22,
+                calcio: 22.0,
                 hierro: 2.7,
-                magnesio: 20,
-                potasio: 315,
+                magnesio: 20.0,
+                potasio: 315.0,
                 vitamina_a: 0,
                 vitamina_c: 0,
                 vitamina_d: 0,
                 vitamina_e: 0.4,
-                folato: 8,
+                folato: 8.0,
                 vitamina_b12: 2.5,
                 notas: ''
             },
@@ -37,19 +101,19 @@
                 categoria: "Carnes",
                 nombre: "Entrecot de Ternera",
                 kcal: 250,
-                proteinas: 25,
+                proteinas: 25.0,
                 hidratos: 0,
-                grasas: 16,
+                grasas: 16.0,
                 fibra: 0,
-                calcio: 20,
+                calcio: 20.0,
                 hierro: 2.9,
-                magnesio: 23,
-                potasio: 330,
+                magnesio: 23.0,
+                potasio: 330.0,
                 vitamina_a: 0,
                 vitamina_c: 0,
                 vitamina_d: 0,
                 vitamina_e: 0.3,
-                folato: 9,
+                folato: 9.0,
                 vitamina_b12: 2.8,
                 notas: ''
             }
@@ -110,22 +174,22 @@
                 setResultados(resultadosFiltrados);
             };
 
-            return React.createElement('div', { className: "container mx-auto p-4" },
-                React.createElement('h1', { className: "text-2xl font-bold mb-4" }, "Buscador de Alimentos"),
+            return React.createElement('div', { className: "container" },
+                React.createElement('h1', { style: { textAlign: 'center', color: '#333' } }, "Buscador de Alimentos"),
                 
-                React.createElement('div', { className: "flex space-x-2 mb-4" },
+                React.createElement('div', { className: "search-container" },
                     React.createElement('input', {
                         type: "text",
                         value: terminoBusqueda,
                         onChange: (e) => setTerminoBusqueda(e.target.value),
                         placeholder: "Buscar alimento",
-                        className: "input input-bordered w-full max-w-xs"
+                        className: "search-input"
                     }),
                     
                     React.createElement('select', {
                         value: categoria,
                         onChange: (e) => setCategoria(e.target.value),
-                        className: "select select-bordered w-full max-w-xs"
+                        className: "search-input"
                     },
                         React.createElement('option', { value: "" }, "Todas las categorías"),
                         categorias.map((cat, index) => 
@@ -135,60 +199,58 @@
                     
                     React.createElement('button', {
                         onClick: handleBuscar,
-                        className: "btn btn-primary"
+                        className: "search-button"
                     }, "Buscar")
                 ),
 
                 resultadosOrdenados.length > 0 
-                    ? React.createElement('div', { className: "overflow-x-auto" },
-                        React.createElement('table', { className: "table w-full table-compact" },
-                            React.createElement('thead', null,
-                                React.createElement('tr', null,
-                                    React.createElement('th', { onClick: () => handleOrdenar('nombre') }, "Nombre"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('categoria') }, "Categoría"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('kcal') }, "Calorías (kcal)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('proteinas') }, "Proteínas (g)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('grasas') }, "Grasas (g)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('hidratos') }, "Hidratos (g)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('fibra') }, "Fibra (g)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('potasio') }, "Potasio (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('calcio') }, "Calcio (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('hierro') }, "Hierro (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('magnesio') }, "Magnesio (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('vitamina_a') }, "Vitamina A (µg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('vitamina_c') }, "Vitamina C (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('vitamina_d') }, "Vitamina D (µg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('vitamina_e') }, "Vitamina E (mg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('folato') }, "Folato (µg)"),
-                                    React.createElement('th', { onClick: () => handleOrdenar('vitamina_b12') }, "Vitamina B12 (µg)")
-                                )
-                            ),
-                            React.createElement('tbody', null,
-                                resultadosOrdenados.map((alimento, index) => 
-                                    React.createElement('tr', { key: index },
-                                        React.createElement('td', null, alimento.nombre),
-                                        React.createElement('td', null, alimento.categoria),
-                                        React.createElement('td', { className: "text-center" }, alimento.kcal.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.proteinas.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.grasas.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.hidratos.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.fibra.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.potasio.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.calcio.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.hierro.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.magnesio.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.vitamina_a.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.vitamina_c.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.vitamina_d.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.vitamina_e.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.folato.toFixed(1)),
-                                        React.createElement('td', { className: "text-center" }, alimento.vitamina_b12.toFixed(1))
-                                    )
+                    ? React.createElement('table', null,
+                        React.createElement('thead', null,
+                            React.createElement('tr', null,
+                                React.createElement('th', { onClick: () => handleOrdenar('nombre') }, "Nombre"),
+                                React.createElement('th', { onClick: () => handleOrdenar('categoria') }, "Categoría"),
+                                React.createElement('th', { onClick: () => handleOrdenar('kcal') }, "Calorías (kcal)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('proteinas') }, "Proteínas (g)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('grasas') }, "Grasas (g)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('hidratos') }, "Hidratos (g)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('fibra') }, "Fibra (g)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('potasio') }, "Potasio (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('calcio') }, "Calcio (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('hierro') }, "Hierro (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('magnesio') }, "Magnesio (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_a') }, "Vitamina A (µg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_c') }, "Vitamina C (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_d') }, "Vitamina D (µg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_e') }, "Vitamina E (mg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('folato') }, "Folato (µg)"),
+                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_b12') }, "Vitamina B12 (µg)")
+                            )
+                        ),
+                        React.createElement('tbody', null,
+                            resultadosOrdenados.map((alimento, index) => 
+                                React.createElement('tr', { key: index },
+                                    React.createElement('td', null, alimento.nombre),
+                                    React.createElement('td', null, alimento.categoria),
+                                    React.createElement('td', null, alimento.kcal.toFixed(1)),
+                                    React.createElement('td', null, alimento.proteinas.toFixed(1)),
+                                    React.createElement('td', null, alimento.grasas.toFixed(1)),
+                                    React.createElement('td', null, alimento.hidratos.toFixed(1)),
+                                    React.createElement('td', null, alimento.fibra.toFixed(1)),
+                                    React.createElement('td', null, alimento.potasio.toFixed(1)),
+                                    React.createElement('td', null, alimento.calcio.toFixed(1)),
+                                    React.createElement('td', null, alimento.hierro.toFixed(1)),
+                                    React.createElement('td', null, alimento.magnesio.toFixed(1)),
+                                    React.createElement('td', null, alimento.vitamina_a.toFixed(1)),
+                                    React.createElement('td', null, alimento.vitamina_c.toFixed(1)),
+                                    React.createElement('td', null, alimento.vitamina_d.toFixed(1)),
+                                    React.createElement('td', null, alimento.vitamina_e.toFixed(1)),
+                                    React.createElement('td', null, alimento.folato.toFixed(1)),
+                                    React.createElement('td', null, alimento.vitamina_b12.toFixed(1))
                                 )
                             )
                         )
                     )
-                    : React.createElement('p', null, "No se encontraron alimentos")
+                    : React.createElement('p', { style: { textAlign: 'center' } }, "No se encontraron alimentos")
             );
         }
 
