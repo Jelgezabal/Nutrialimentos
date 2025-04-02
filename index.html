@@ -2,80 +2,294 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Buscador de Alimentos</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nutrientes Ordenables</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f0f0;
             color: #333;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+            max-width: 100%;
         }
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 20px;
-        }
-        .search-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .search-input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .search-button {
+        
+        .header {
             background-color: #4CAF50;
             color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            padding: 15px 10px;
+            text-align: center;
         }
-        .search-button:hover {
-            background-color: #45a049;
+        
+        .header h1 {
+            font-size: 1.4rem;
+            margin: 0;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table th {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
+        
+        .controls {
+            background: white;
             padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        table th:hover {
-            background-color: #e8e8e8;
+        
+        .control-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
         }
-        table td {
-            border: 1px solid #ddd;
+        
+        select, button {
             padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        
+        select {
+            flex-grow: 1;
+        }
+        
+        button {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        button.sort-button {
+            flex: 1;
             text-align: center;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
-        table tr:nth-child(even) {
-            background-color: #f2f2f2;
+        
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
         }
-        table tr:hover {
-            background-color: #ddd;
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .food-list {
+            padding: 10px;
+        }
+        
+        .food-item {
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .food-header {
+            padding: 12px;
+            background-color: #f8f8f8;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .category-badge {
+            font-size: 0.75rem;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .nutrient-grid {
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .nutrient {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 8px;
+            background: #f9f9f9;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+        
+        .nutrient-label {
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        
+        .sort-arrow {
+            display: none;
+            font-size: 0.8rem;
+        }
+        
+        .sort-button.asc .sort-arrow.up,
+        .sort-button.desc .sort-arrow.down {
+            display: inline;
+        }
+        
+        .sort-button.asc, .sort-button.desc {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .sorting-options {
+            background: #f8f8f8;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        
+        .sorting-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .sorting-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .sort-pill {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        .sort-pill.asc, .sort-pill.desc {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+        }
+        
+        .sort-pill.asc:after {
+            content: " ▲";
+        }
+        
+        .sort-pill.desc:after {
+            content: " ▼";
+        }
+        
+        /* Versión móvil específica */
+        @media screen and (max-width: 428px) {
+            .nutrient {
+                font-size: 0.85rem;
+                padding: 5px 6px;
+            }
+            
+            .food-header {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+            
+            .sort-pill {
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <div class="header">
+        <h1>Nutrientes Ordenables</h1>
+    </div>
+    
+    <div class="controls">
+        <div class="control-row">
+            <select id="categoryFilter">
+                <option value="todas">Todas las categorías</option>
+                <option value="Carnes">Carnes</option>
+                <option value="Pescados">Pescados y mariscos</option>
+                <option value="Huevos">Huevos</option>
+                <option value="Lácteos">Lácteos</option>
+                <option value="Verduras">Verduras</option>
+                <option value="Frutas">Frutas</option>
+                <option value="Cereales">Cereales</option>
+                <option value="Legumbres">Legumbres</option>
+                <option value="Frutos secos">Frutos secos</option>
+            </select>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="macro">Macronutrientes</div>
+            <div class="tab" data-tab="micro">Micronutrientes</div>
+        </div>
+        
+        <div id="macroSorting" class="sorting-options">
+            <div class="sorting-title">Ordenar por:</div>
+            <div class="sorting-buttons">
+                <button class="sort-pill" data-field="nombre">Nombre</button>
+                <button class="sort-pill" data-field="kcal">Calorías</button>
+                <button class="sort-pill" data-field="proteinas">Proteínas</button>
+                <button class="sort-pill" data-field="hidratos">Carbohidratos</button>
+                <button class="sort-pill" data-field="grasas">Grasas</button>
+                <button class="sort-pill" data-field="fibra">Fibra</button>
+            </div>
+        </div>
+        
+        <div id="microSorting" class="sorting-options" style="display: none;">
+            <div class="sorting-title">Ordenar por:</div>
+            <div class="sorting-buttons">
+                <button class="sort-pill" data-field="nombre">Nombre</button>
+                <button class="sort-pill" data-field="calcio">Calcio</button>
+                <button class="sort-pill" data-field="hierro">Hierro</button>
+                <button class="sort-pill" data-field="magnesio">Magnesio</button>
+                <button class="sort-pill" data-field="potasio">Potasio</button>
+                <button class="sort-pill" data-field="vitamina_a">Vitamina A</button>
+                <button class="sort-pill" data-field="vitamina_c">Vitamina C</button>
+                <button class="sort-pill" data-field="vitamina_d">Vitamina D</button>
+                <button class="sort-pill" data-field="vitamina_e">Vitamina E</button>
+                <button class="sort-pill" data-field="folato">Folato</button>
+                <button class="sort-pill" data-field="vitamina_b12">Vitamina B12</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="food-list" id="foodContainer">
+        <!-- Los alimentos se cargarán aquí -->
+    </div>
 
     <script>
-        // Base de datos de alimentos
+        // Lista completa de alimentos
         const alimentos = [
             {
                 "categoria": "Carnes",
@@ -2276,149 +2490,204 @@
                     "folato": 15,
                     "vitamina_b12": 0,
                     "notas": ''
-}
+ }
         ];
 
-        function BuscadorAlimentos() {
-            const [terminoBusqueda, setTerminoBusqueda] = React.useState('');
-            const [categoria, setCategoria] = React.useState('');
-            const [resultados, setResultados] = React.useState(alimentos);
-            const [ordenamiento, setOrdenamiento] = React.useState({ 
-                columna: null, 
-                direccion: 'asc' 
-            });
+        // Definición de macronutrientes y micronutrientes
+        const macronutrientes = [
+            { campo: "kcal", nombre: "Calorías" },
+            { campo: "proteinas", nombre: "Proteínas (g)" },
+            { campo: "hidratos", nombre: "Hidratos (g)" },
+            { campo: "grasas", nombre: "Grasas (g)" },
+            { campo: "fibra", nombre: "Fibra (g)" }
+        ];
 
-            const buscarAlimentos = (terminoBusqueda, categoria, resultados) => {
-                return resultados.filter(alimento => 
-                    (terminoBusqueda === '' || alimento.nombre.toLowerCase().includes(terminoBusqueda.toLowerCase())) &&
-                    (categoria === '' || alimento.categoria.toLowerCase() === categoria.toLowerCase())
-                );
-            };
+        const micronutrientes = [
+            { campo: "calcio", nombre: "Calcio (mg)" },
+            { campo: "hierro", nombre: "Hierro (mg)" },
+            { campo: "magnesio", nombre: "Magnesio (mg)" },
+            { campo: "potasio", nombre: "Potasio (mg)" },
+            { campo: "vitamina_a", nombre: "Vit. A (µg)" },
+            { campo: "vitamina_c", nombre: "Vit. C (mg)" },
+            { campo: "vitamina_d", nombre: "Vit. D (µg)" },
+            { campo: "vitamina_e", nombre: "Vit. E (mg)" },
+            { campo: "folato", nombre: "Folato (µg)" },
+            { campo: "vitamina_b12", nombre: "Vit. B12 (µg)" }
+        ];
 
-            const categorias = Array.from(new Set(alimentos.map(a => a.categoria)));
+        // Estado de la aplicación
+        let estadoApp = {
+            categoriaActual: "todas",
+            nutrientesActuales: "macro",
+            ordenActual: {
+                campo: "nombre",
+                direccion: "asc"
+            }
+        };
 
-            const resultadosOrdenados = React.useMemo(() => {
-                if (!ordenamiento.columna) return resultados;
-
-                return [...resultados].sort((a, b) => {
-                    const valorA = a[ordenamiento.columna];
-                    const valorB = b[ordenamiento.columna];
-
-                    if (typeof valorA === 'string' && typeof valorB === 'string') {
-                        return ordenamiento.direccion === 'asc'
-                            ? valorA.localeCompare(valorB)
-                            : valorB.localeCompare(valorA);
-                    }
-
-                    if (typeof valorA === 'number' && typeof valorB === 'number') {
-                        return ordenamiento.direccion === 'asc' 
-                            ? valorA - valorB 
-                            : valorB - valorA;
-                    }
-
-                    return 0;
-                });
-            }, [resultados, ordenamiento]);
-
-            const handleOrdenar = (columna) => {
-                setOrdenamiento(prev => ({
-                    columna,
-                    direccion: prev.columna === columna && prev.direccion === 'asc' 
-                        ? 'desc' 
-                        : 'asc'
-                }));
-            };
-
-            const handleBuscar = () => {
-                const resultadosFiltrados = buscarAlimentos(terminoBusqueda, categoria, alimentos);
-                setResultados(resultadosFiltrados);
-            };
-
-            return React.createElement('div', { className: "container" },
-                React.createElement('h1', { style: { textAlign: 'center', color: '#333' } }, "Buscador de Alimentos"),
-                
-                React.createElement('div', { className: "search-container" },
-                    React.createElement('input', {
-                        type: "text",
-                        value: terminoBusqueda,
-                        onChange: (e) => setTerminoBusqueda(e.target.value),
-                        placeholder: "Buscar alimento",
-                        className: "search-input"
-                    }),
-                    
-                    React.createElement('select', {
-                        value: categoria,
-                        onChange: (e) => setCategoria(e.target.value),
-                        className: "search-input"
-                    },
-                        React.createElement('option', { value: '' }, "Todas las categorías"),
-                        categorias.map((cat, index) => 
-                            React.createElement('option', { key: index, value: cat }, cat)
-                        )
-                    ),
-                    
-                    React.createElement('button', {
-                        onClick: handleBuscar,
-                        className: "search-button"
-                    }, "Buscar")
-                ),
-
-                resultadosOrdenados.length > 0 
-                    ? React.createElement('table', null,
-                        React.createElement('thead', null,
-                            React.createElement('tr', null,
-                                React.createElement('th', { onClick: () => handleOrdenar('nombre') }, "Nombre"),
-                                React.createElement('th', { onClick: () => handleOrdenar('categoria') }, "Categoría"),
-                                React.createElement('th', { onClick: () => handleOrdenar('kcal') }, "Calorías (kcal)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('proteinas') }, "Proteínas (g)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('grasas') }, "Grasas (g)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('hidratos') }, "Hidratos (g)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('fibra') }, "Fibra (g)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('potasio') }, "Potasio (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('calcio') }, "Calcio (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('hierro') }, "Hierro (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('magnesio') }, "Magnesio (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_a') }, "Vitamina A (µg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_c') }, "Vitamina C (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_d') }, "Vitamina D (µg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_e') }, "Vitamina E (mg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('folato') }, "Folato (µg)"),
-                                React.createElement('th', { onClick: () => handleOrdenar('vitamina_b12') }, "Vitamina B12 (µg)")
-                            )
-                        ),
-                        React.createElement('tbody', null,
-                            resultadosOrdenados.map((alimento, index) => 
-                                React.createElement('tr', { key: index },
-                                    React.createElement('td', null, alimento.nombre),
-                                    React.createElement('td', null, alimento.categoria),
-                                    React.createElement('td', null, alimento.kcal.toFixed(1)),
-                                    React.createElement('td', null, alimento.proteinas.toFixed(1)),
-                                    React.createElement('td', null, alimento.grasas.toFixed(1)),
-                                    React.createElement('td', null, alimento.hidratos.toFixed(1)),
-                                    React.createElement('td', null, alimento.fibra.toFixed(1)),
-                                    React.createElement('td', null, alimento.potasio.toFixed(1)),
-                                    React.createElement('td', null, alimento.calcio.toFixed(1)),
-                                    React.createElement('td', null, alimento.hierro.toFixed(1)),
-                                    React.createElement('td', null, alimento.magnesio.toFixed(1)),
-                                    React.createElement('td', null, alimento.vitamina_a.toFixed(1)),
-                                    React.createElement('td', null, alimento.vitamina_c.toFixed(1)),
-                                    React.createElement('td', null, alimento.vitamina_d.toFixed(1)),
-                                    React.createElement('td', null, alimento.vitamina_e.toFixed(1)),
-                                    React.createElement('td', null, alimento.folato.toFixed(1)),
-                                    React.createElement('td', null, alimento.vitamina_b12.toFixed(1))
-                                )
-                            )
-                        )
-                    )
-                    : React.createElement('p', { style: { textAlign: 'center' } }, "No se encontraron alimentos")
-            );
+        // Función para filtrar alimentos por categoría
+        function filtrarPorCategoria(alimentos, categoria) {
+            if (categoria === "todas") {
+                return alimentos;
+            } else {
+                return alimentos.filter(a => a.categoria.startsWith(categoria));
+            }
         }
 
-        // Renderiza el componente
-        ReactDOM.render(
-            React.createElement(BuscadorAlimentos),
-            document.getElementById('root')
-        );
+        // Función para ordenar alimentos
+        function ordenarAlimentos(alimentos, campo, direccion) {
+            return [...alimentos].sort((a, b) => {
+                let valorA = a[campo];
+                let valorB = b[campo];
+                
+                // Manejar texto vs número
+                if (campo === "nombre") {
+                    return direccion === "asc" 
+                        ? valorA.localeCompare(valorB) 
+                        : valorB.localeCompare(valorA);
+                } else {
+                    return direccion === "asc" 
+                        ? valorA - valorB 
+                        : valorB - valorA;
+                }
+            });
+        }
+
+        // Función para mostrar los alimentos
+        function mostrarAlimentos() {
+            const container = document.getElementById("foodContainer");
+            container.innerHTML = "";
+            
+            // Filtrar por categoría
+            let alimentosFiltrados = filtrarPorCategoria(alimentos, estadoApp.categoriaActual);
+            
+            // Ordenar alimentos
+            alimentosFiltrados = ordenarAlimentos(
+                alimentosFiltrados,
+                estadoApp.ordenActual.campo,
+                estadoApp.ordenActual.direccion
+            );
+            
+            // Mostrar mensaje si no hay resultados
+            if (alimentosFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>No se encontraron alimentos con estos criterios.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Determinar qué nutrientes mostrar
+            const nutrientes = estadoApp.nutrientesActuales === "macro" 
+                ? macronutrientes 
+                : micronutrientes;
+            
+            // Crear elementos de alimentos
+            alimentosFiltrados.forEach(alimento => {
+                const foodItem = document.createElement("div");
+                foodItem.className = "food-item";
+                
+                const foodHeader = document.createElement("div");
+                foodHeader.className = "food-header";
+                foodHeader.innerHTML = `
+                    <span>${alimento.nombre}</span>
+                    <span class="category-badge">${alimento.categoria}</span>
+                `;
+                
+                const nutrientGrid = document.createElement("div");
+                nutrientGrid.className = "nutrient-grid";
+                
+                nutrientes.forEach(nutriente => {
+                    const nutrientDiv = document.createElement("div");
+                    nutrientDiv.className = "nutrient";
+                    
+                    // Resaltar si es el campo ordenado actualmente
+                    if (nutriente.campo === estadoApp.ordenActual.campo) {
+                        nutrientDiv.style.backgroundColor = "#e8f5e9";
+                    }
+                    
+                    nutrientDiv.innerHTML = `
+                        <span class="nutrient-label">${nutriente.nombre}:</span>
+                        <span>${alimento[nutriente.campo] !== undefined ? alimento[nutriente.campo] : 0}</span>
+                    `;
+                    nutrientGrid.appendChild(nutrientDiv);
+                });
+                
+                foodItem.appendChild(foodHeader);
+                foodItem.appendChild(nutrientGrid);
+                container.appendChild(foodItem);
+            });
+        }
+
+        // Actualizar la UI de botones de ordenamiento
+        function actualizarBotonesOrdenamiento() {
+            // Limpiar clases de todos los botones
+            document.querySelectorAll(".sort-pill").forEach(btn => {
+                btn.classList.remove("asc", "desc");
+            });
+            
+            // Aplicar clase al botón activo
+            const selector = `.sort-pill[data-field="${estadoApp.ordenActual.campo}"]`;
+            const botones = document.querySelectorAll(selector);
+            
+            botones.forEach(boton => {
+                boton.classList.add(estadoApp.ordenActual.direccion);
+            });
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener("DOMContentLoaded", function() {
+            // Configurar selector de categoría
+            document.getElementById("categoryFilter").addEventListener("change", function() {
+                estadoApp.categoriaActual = this.value;
+                mostrarAlimentos();
+            });
+            
+            // Configurar pestañas
+            document.querySelectorAll(".tab").forEach(tab => {
+                tab.addEventListener("click", function() {
+                    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                    
+                    estadoApp.nutrientesActuales = this.getAttribute("data-tab");
+                    
+                    // Mostrar/ocultar opciones de ordenamiento según la pestaña
+                    if (estadoApp.nutrientesActuales === "macro") {
+                        document.getElementById("macroSorting").style.display = "block";
+                        document.getElementById("microSorting").style.display = "none";
+                    } else {
+                        document.getElementById("macroSorting").style.display = "none";
+                        document.getElementById("microSorting").style.display = "block";
+                    }
+                    
+                    mostrarAlimentos();
+                });
+            });
+            
+            // Configurar botones de ordenamiento
+            document.querySelectorAll(".sort-pill").forEach(button => {
+                button.addEventListener("click", function() {
+                    const campo = this.getAttribute("data-field");
+                    
+                    // Actualizar dirección de ordenamiento
+                    if (estadoApp.ordenActual.campo === campo) {
+                        estadoApp.ordenActual.direccion = estadoApp.ordenActual.direccion === "asc" ? "desc" : "asc";
+                    } else {
+                        estadoApp.ordenActual.campo = campo;
+                        estadoApp.ordenActual.direccion = "asc";
+                    }
+                    
+                    // Actualizar UI y mostrar alimentos
+                    actualizarBotonesOrdenamiento();
+                    mostrarAlimentos();
+                });
+            });
+            
+            // Mostrar alimentos inicialmente y configurar botón activo
+            actualizarBotonesOrdenamiento();
+            mostrarAlimentos();
+        });
     </script>
 </body>
 </html>
