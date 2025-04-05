@@ -485,8 +485,9 @@
 
         // Función para filtrar alimentos por categoría
         function filtrarPorCategoria(alimentos, categoria) {
+            // Si es "todas", mostrar todos excepto los veganos
             if (categoria === "todas") {
-                return alimentos;
+                return alimentos.filter(a => a.Categoria !== "Vegano");
             } else {
                 return alimentos.filter(a => a.Categoria === categoria);
             }
@@ -521,10 +522,16 @@
         // Función para actualizar el contador de alimentos
         function actualizarContadorAlimentos(total, filtrados) {
             const contador = document.getElementById('foodCount');
+            
+            // Total de alimentos excluyendo los veganos
+            const totalSinVeganos = alimentos.filter(a => a.Categoria !== "Vegano").length;
+            
             if (estadoApp.categoriaActual === "todas") {
-                contador.textContent = `${total} alimentos`;
+                contador.textContent = `${totalSinVeganos} alimentos`;
+            } else if (estadoApp.categoriaActual === "Vegano") {
+                contador.textContent = `${filtrados} alimentos veganos`;
             } else {
-                contador.textContent = `${filtrados} de ${total} alimentos`;
+                contador.textContent = `${filtrados} de ${totalSinVeganos} alimentos`;
             }
         }
 
