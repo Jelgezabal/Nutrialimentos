@@ -700,7 +700,7 @@
             mostrarAlimentos();
             
             // Intentar cargar desde API en segundo plano
-            fetch('https://n8n.srv789262.hstgr.cloud/webhook/api/test123')
+            fetch('https://n8n.srv789262.hstgr.cloud/webhook/api/alimentos')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`Error HTTP: ${response.status}`);
